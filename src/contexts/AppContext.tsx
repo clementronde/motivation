@@ -23,7 +23,19 @@ const getInitialData = (): AppData => {
   const stored = localStorage.getItem(STORAGE_KEY);
   if (stored) {
     try {
-      return JSON.parse(stored);
+      const data = JSON.parse(stored);
+      // Migration: add streak fields if they don't exist
+      if (!('currentStreak' in data.clement)) {
+        data.clement.currentStreak = 0;
+        data.clement.longestStreak = 0;
+        data.clement.lastStreakDate = '';
+      }
+      if (!('currentStreak' in data.charlotte)) {
+        data.charlotte.currentStreak = 0;
+        data.charlotte.longestStreak = 0;
+        data.charlotte.lastStreakDate = '';
+      }
+      return data;
     } catch (e) {
       console.error('Error parsing stored data:', e);
     }
@@ -35,12 +47,18 @@ const getInitialData = (): AppData => {
       goals: [],
       dailyProgress: [],
       weeklyProgress: [],
+      currentStreak: 0,
+      longestStreak: 0,
+      lastStreakDate: '',
     },
     charlotte: {
       profile: 'charlotte',
       goals: [],
       dailyProgress: [],
       weeklyProgress: [],
+      currentStreak: 0,
+      longestStreak: 0,
+      lastStreakDate: '',
     },
     lastUpdated: new Date().toISOString(),
   };
@@ -97,15 +115,74 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         (p) => p.date === progress.date && p.goalId === progress.goalId
       );
 
+      const updatedDailyProgress = existing
+        ? prev[user].dailyProgress.map((p) =>
+            p.date === progress.date && p.goalId === progress.goalId ? progress : p
+          )
+        : [...prev[user].dailyProgress, progress];
+
+      // Calculate new streak
+      const tempData = {
+        ...prev,
+        [user]: {
+          ...prev[user],
+          dailyProgress: updatedDailyProgress,
+        },
+      };
+
+      // Use the temp data to calculate streak
+      const userData = tempData[user];
+      const dailyGoals = userData.goals.filter((g) => g.type === 'daily');
+
+      let streakData = {
+        currentStreak: userData.currentStreak,
+        longestStreak: userData.longestStreak,
+        lastStreakDate: userData.lastStreakDate,
+      };
+
+      if (dailyGoals.length > 0) {
+        const todayProgress = updatedDailyProgress.filter((p) => p.date === progress.date);
+        const allCompleted = dailyGoals.every((goal) =>
+          todayProgress.some((p) => p.goalId === goal.id && p.completed)
+        );
+
+        if (allCompleted) {
+          const today = new Date(progress.date);
+          const lastStreakDate = userData.lastStreakDate ? new Date(userData.lastStreakDate) : null;
+
+          if (!lastStreakDate) {
+            streakData = { currentStreak: 1, longestStreak: 1, lastStreakDate: progress.date };
+          } else {
+            const daysDiff = Math.floor((today.getTime() - lastStreakDate.getTime()) / (1000 * 60 * 60 * 24));
+
+            if (daysDiff === 0) {
+              streakData = {
+                currentStreak: userData.currentStreak || 1,
+                longestStreak: userData.longestStreak,
+                lastStreakDate: progress.date,
+              };
+            } else if (daysDiff === 1) {
+              const newStreak = (userData.currentStreak || 0) + 1;
+              streakData = {
+                currentStreak: newStreak,
+                longestStreak: Math.max(userData.longestStreak, newStreak),
+                lastStreakDate: progress.date,
+              };
+            } else {
+              streakData = { currentStreak: 1, longestStreak: userData.longestStreak, lastStreakDate: progress.date };
+            }
+          }
+        }
+      }
+
       return {
         ...prev,
         [user]: {
           ...prev[user],
-          dailyProgress: existing
-            ? prev[user].dailyProgress.map((p) =>
-                p.date === progress.date && p.goalId === progress.goalId ? progress : p
-              )
-            : [...prev[user].dailyProgress, progress],
+          dailyProgress: updatedDailyProgress,
+          currentStreak: streakData.currentStreak,
+          longestStreak: streakData.longestStreak,
+          lastStreakDate: streakData.lastStreakDate,
         },
         lastUpdated: new Date().toISOString(),
       };

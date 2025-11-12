@@ -7,6 +7,7 @@ import GoalsList from './GoalsList';
 import AddGoalModal from './AddGoalModal';
 import ComparisonBanner from './ComparisonBanner';
 import MotivationBanner from './MotivationBanner';
+import StreakDisplay from './StreakDisplay';
 
 interface DashboardProps {
   onBack: () => void;
@@ -110,6 +111,9 @@ const Dashboard: React.FC<DashboardProps> = ({ onBack }) => {
 
       {/* Comparison Banner */}
       <ComparisonBanner userData={userData} otherUserData={otherUserData} otherUserName={otherUser} />
+
+      {/* Streak Display */}
+      <StreakDisplay userData={userData} />
 
       {/* Main Content */}
       <div
