@@ -19,6 +19,8 @@ Une application web dynamique et motivante pour tracker vos habitudes saines et 
 - Bandeaux de motivation dynamiques basés sur votre progression
 - Messages motivants personnalisés selon votre performance
 - Système de compétition amicale avec pourcentages de réussite
+- **Système de streaks (flammes)** : Maintiens une série de jours consécutifs en complétant tous tes objectifs quotidiens
+- Record personnel à battre pour te motiver davantage
 
 ### 🎨 Design adaptatif double thème
 - **Thème Clément** : Dark, sportif et énergique avec des couleurs néon
@@ -69,8 +71,9 @@ npm run preview
    - Utilisez les objectifs populaires prédéfinis ou créez les vôtres
    - Définissez si c'est un objectif quotidien ou hebdomadaire
 3. **Tracker votre progression** : Utilisez les boutons +/- pour mettre à jour vos objectifs
-4. **Comparer avec l'autre utilisateur** : Consultez le bandeau de comparaison pour voir qui est en avance
-5. **Rester motivé** : Lisez les messages motivants personnalisés selon votre performance
+4. **Maintenir votre streak** : Complétez TOUS vos objectifs quotidiens pour allumer la flamme 🔥 et maintenir votre série de jours consécutifs
+5. **Comparer avec l'autre utilisateur** : Consultez le bandeau de comparaison pour voir qui est en avance
+6. **Rester motivé** : Lisez les messages motivants personnalisés selon votre performance
 
 ## 🏗️ Structure du projet
 
@@ -83,7 +86,8 @@ src/
 │   ├── GoalsList.tsx            # Liste des objectifs
 │   ├── AddGoalModal.tsx         # Modal d'ajout d'objectif
 │   ├── ComparisonBanner.tsx     # Bandeau de comparaison
-│   └── MotivationBanner.tsx     # Bandeau de motivation
+│   ├── MotivationBanner.tsx     # Bandeau de motivation
+│   └── StreakDisplay.tsx        # Affichage des séries de victoires
 ├── contexts/           # Contexts React
 │   ├── AppContext.tsx           # État global de l'application
 │   └── ThemeContext.tsx         # Gestion des thèmes

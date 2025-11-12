@@ -29,6 +29,9 @@ export interface UserData {
   goals: Goal[];
   dailyProgress: DailyProgress[];
   weeklyProgress: WeeklyProgress[];
+  currentStreak: number;
+  longestStreak: number;
+  lastStreakDate: string; // YYYY-MM-DD
 }
 
 export interface AppData {
